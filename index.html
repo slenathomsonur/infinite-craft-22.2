@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Craft</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .auth-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-section {
+            flex: 3;
+            min-width: 600px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ff7e5f;
+            border-bottom: 2px solid #ff7e5f;
+            padding-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: 2px solid #ff7e5f;
+        }
+
+        button {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .user-info {
+            background: rgba(255, 126, 95, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .elements-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        .element {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            padding: 15px 10px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            user-select: none;
+            position: relative;
+        }
+
+        .element:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .element:active {
+            cursor: grabbing;
+        }
+
+        .rarity-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: gold;
+            color: black;
+            font-size: 0.7rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .common { background: #6a11cb; }
+        .uncommon { background: #2575fc; }
+        .rare { background: #ff7e5f; }
+        .epic { background: #b21f1f; }
+        .legendary { background: #fdbb2d; color: black; }
+
+        .discovery-area {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .discovery-box {
+            flex: 1;
+            min-width: 250px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .combine-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .drop-zone {
+            width: 100px;
+            height: 100px;
+            border: 3px dashed #ff7e5f;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            color: #ff7e5f;
+        }
+
+        .combine-btn {
+            width: auto;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+        }
+
+        .result-area {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 126, 95, 0.2);
+            border-radius: 10px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .new-element {
+            font-size: 1.5rem;
+            color: #ff7e5f;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.3);
+            border: 1px solid red;
+        }
+
+        .success {
+            background: rgba(0, 255, 0, 0.3);
+            border: 1px solid green;
+        }
+
+        .admin-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid red;
+            display: none;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff7e5f;
+        }
+
+        .account-actions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .game-section, .auth-section {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Infinite Craft</h1>
+            <p class="tagline">Combine elements to create the universe!</p>
+        </header>
+
+        <div class="main-content">
+            <section class="auth-section">
+                <h2 class="section-title">Account System</h2>
+                
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password">
+                </div>
+                
+                <button id="login-btn">Login</button>
+                <button id="register-btn">Register New Account</button>
+                
+                <div id="login-message" class="message"></div>
+                
+                <div class="user-info" id="user-info" style="display: none;">
+                    <h3>Account Info</h3>
+                    <p>Welcome, <span id="display-username">User</span>!</p>
+                    <p>Elements Discovered: <span id="elements-count">0</span></p>
+                    <p>Combinations Made: <span id="combinations-count">0</span></p>
+                    
+                    <div class="account-actions">
+                        <button id="edit-account-btn">Edit Account Info</button>
+                        <button id="logout-btn">Logout</button>
+                    </div>
+                </div>
+                
+                <div class="admin-section" id="admin-section">
+                    <h3>Account Recovery</h3>
+                    <p>Too many failed login attempts. Enter admin password to recover your account.</p>
+                    <div class="form-group">
+                        <label for="admin-password">Admin Password</label>
+                        <input type="password" id="admin-password" placeholder="Enter admin password">
+                    </div>
+                    <button id="admin-recover-btn">Recover Account</button>
+                </div>
+            </section>
+
+            <section class="game-section">
+                <h2 class="section-title">Infinite Craft</h2>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-elements">7</div>
+                        <div>Total Elements</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="user-elements">7</div>
+                        <div>Your Elements</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="combinations">0</div>
+                        <div>Combinations</div>
+                    </div>
+                </div>
+                
+                <div class="discovery-area">
+                    <div class="discovery-box">
+                        <h3 class="section-title">Your Elements</h3>
+                        <div class="elements-container" id="user-elements-container">
+                            <!-- Elements will be added here dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="discovery-box">
+                        <h3 class="section-title">All Elements</h3>
+                        <div class="elements-container" id="all-elements-container">
+                            <!-- Elements will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="combine-area">
+                    <div class="drop-zone" id="drop-zone-1">+</div>
+                    <div class="drop-zone" id="drop-zone-2">+</div>
+                    <button class="combine-btn" id="combine-btn">Combine!</button>
+                </div>
+                
+                <div class="result-area">
+                    <h3>Combination Result</h3>
+                    <div id="result-message">Drag two elements to the boxes above and click Combine!</div>
+                    <div id="new-element" class="new-element"></div>
+                </div>
+            </section>
+        </div>
+        
+        <footer>
+            <p>&copy; 2025 Dem Studios. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Game data with rarity information
+        const baseElements = [
+            { name: 'Earth', rarity: 'common' },
+            { name: 'Fire', rarity: 'common' },
+            { name: 'Water', rarity: 'common' },
+            { name: 'Wind', rarity: 'common' },
+            { name: 'Life', rarity: 'uncommon' },
+            { name: 'Energy', rarity: 'uncommon' },
+            { name: 'Dog', rarity: 'rare' },
+            { name: 'Parrot', rarity: 'rare' }
+        ];
+
+        const combinations = {
+            'Earth+Fire': { name: 'Lava', rarity: 'uncommon' },
+            'Earth+Water': { name: 'Mud', rarity: 'common' },
+            'Earth+Wind': { name: 'Dust', rarity: 'common' },
+            'Fire+Water': { name: 'Steam', rarity: 'common' },
+            'Fire+Wind': { name: 'Smoke', rarity: 'common' },
+            'Water+Wind': { name: 'Wave', rarity: 'common' },
+            'Life+Earth': { name: 'Plant', rarity: 'uncommon' },
+            'Life+Water': { name: 'Algae', rarity: 'uncommon' },
+            'Life+Fire': { name: 'Phoenix', rarity: 'epic' },
+            'Life+Wind': { name: 'Butterfly', rarity: 'rare' },
+            'Energy+Earth': { name: 'Earthquake', rarity: 'rare' },
+            'Energy+Fire': { name: 'Plasma', rarity: 'rare' },
+            'Energy+Water': { name: 'Electric Eel', rarity: 'rare' },
+            'Energy+Wind': { name: 'Storm', rarity: 'uncommon' },
+            'Dog+Earth': { name: 'Burrow', rarity: 'uncommon' },
+            'Dog+Water': { name: 'Swimming Dog', rarity: 'rare' },
+            'Dog+Fire': { name: 'Hot Dog', rarity: 'epic' },
+            'Dog+Wind': { name: 'Flying Dog', rarity: 'legendary' },
+            'Parrot+Earth': { name: 'Ground Parrot', rarity: 'uncommon' },
+            'Parrot+Water': { name: 'Pirate Parrot', rarity: 'rare' },
+            'Parrot+Fire': { name: 'Phoenix Parrot', rarity: 'epic' },
+            'Parrot+Wind': { name: 'Flying Parrot', rarity: 'common' },
+            'Lava+Water': { name: 'Stone', rarity: 'common' },
+            'Lava+Wind': { name: 'Obsidian', rarity: 'rare' },
+            'Plant+Water': { name: 'Swamp', rarity: 'uncommon' },
+            'Plant+Fire': { name: 'Ash', rarity: 'common' },
+            'Plant+Wind': { name: 'Dandelion', rarity: 'uncommon' },
+            'Storm+Water': { name: 'Hurricane', rarity: 'rare' },
+            'Storm+Fire': { name: 'Lightning Storm', rarity: 'epic' },
+            'Stone+Fire': { name: 'Metal', rarity: 'uncommon' },
+            'Stone+Water': { name: 'Sand', rarity: 'common' },
+            'Metal+Water': { name: 'Rust', rarity: 'common' },
+            'Metal+Fire': { name: 'Molten Metal', rarity: 'rare' },
+            'Sand+Fire': { name: 'Glass', rarity: 'uncommon' },
+            'Sand+Wind': { name: 'Sandstorm', rarity: 'rare' }
+        };
+
+        // Account system
+        let accounts = JSON.parse(localStorage.getItem('infiniteCraftAccounts')) || {};
+        let currentUser = null;
+        let loginAttempts = 0;
+        const ADMIN_PASSWORD = "demstudios123adminstudios";
+
+        // DOM elements
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const editAccountBtn = document.getElementById('edit-account-btn');
+        const loginMessage = document.getElementById('login-message');
+        const userInfo = document.getElementById('user-info');
+        const displayUsername = document.getElementById('display-username');
+        const elementsCount = document.getElementById('elements-count');
+        const combinationsCount = document.getElementById('combinations-count');
+        const adminSection = document.getElementById('admin-section');
+        const adminPasswordInput = document.getElementById('admin-password');
+        const adminRecoverBtn = document.getElementById('admin-recover-btn');
+        const userElementsContainer = document.getElementById('user-elements-container');
+        const allElementsContainer = document.getElementById('all-elements-container');
+        const combineBtn = document.getElementById('combine-btn');
+        const dropZone1 = document.getElementById('drop-zone-1');
+        const dropZone2 = document.getElementById('drop-zone-2');
+        const resultMessage = document.getElementById('result-message');
+        const newElement = document.getElementById('new-element');
+        const totalElements = document.getElementById('total-elements');
+        const userElementsStat = document.getElementById('user-elements');
+        const combinationsStat = document.getElementById('combinations');
+
+        // Dragged elements
+        let draggedElement1 = null;
+        let draggedElement2 = null;
+
+        // Initialize the game
+        function initGame() {
+            renderAllElements();
+            updateStats();
+            
+            // Set up event listeners
+            loginBtn.addEventListener('click', handleLogin);
+            registerBtn.addEventListener('click', handleRegister);
+            logoutBtn.addEventListener('click', handleLogout);
+            editAccountBtn.addEventListener('click', handleEditAccount);
+            adminRecoverBtn.addEventListener('click', handleAdminRecovery);
+            combineBtn.addEventListener('click', combineElements);
+            
+            // Set up drag and drop
+            setupDragAndDrop();
+            
+            // Check if user is already logged in
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = savedUser;
+                loadUserData();
+                showUserInfo();
+            }
+        }
+
+        // Render all available elements
+        function renderAllElements() {
+            allElementsContainer.innerHTML = '';
+            const allElements = getAllElements();
+            
+            allElements.forEach(element => {
+                const elementDiv = createElementDiv(element);
+                allElementsContainer.appendChild(elementDiv);
+            });
+            
+            totalElements.textContent = allElements.length;
+        }
+
+        // Get all elements (base + discovered)
+        function getAllElements() {
+            const allElements = [...baseElements];
+            Object.values(combinations).forEach(element => {
+                if (!allElements.some(e => e.name === element.name)) {
+                    allElements.push(element);
+                }
+            });
+            return allElements.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        // Create an element div with rarity badge
+        function createElementDiv(element) {
+            const elementDiv = document.createElement('div');
+            elementDiv.className = `element ${element.rarity}`;
+            elementDiv.textContent = element.name;
+            elementDiv.draggable = true;
+            
+            // Add rarity badge
+            const rarityBadge = document.createElement('span');
+            rarityBadge.className = 'rarity-badge';
+            rarityBadge.textContent = element.rarity.charAt(0).toUpperCase();
+            elementDiv.appendChild(rarityBadge);
+            
+            elementDiv.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', element.name);
+            });
+            
+            return elementDiv;
+        }
+
+        // Render user's elements
+        function renderUserElements() {
+            if (!currentUser) return;
+            
+            userElementsContainer.innerHTML = '';
+            const userData = accounts[currentUser];
+            
+            userData.elements.forEach(elementName => {
+                const element = getElementByName(elementName);
+                if (element) {
+                    const elementDiv = createElementDiv(element);
+                    userElementsContainer.appendChild(elementDiv);
+                }
+            });
+            
+            elementsCount.textContent = userData.elements.length;
+            userElementsStat.textContent = userData.elements.length;
+            combinationsStat.textContent = userData.combinations;
+        }
+
+        // Get element by name
+        function getElementByName(name) {
+            const allElements = getAllElements();
+            return allElements.find(e => e.name === name);
+        }
+
+        // Set up drag and drop functionality
+        function setupDragAndDrop() {
+            // Drop zones
+            [dropZone1, dropZone2].forEach((zone, index) => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.style.backgroundColor = 'rgba(255, 126, 95, 0.2)';
+                });
+                
+                zone.addEventListener('dragleave', () => {
+                    zone.style.backgroundColor = '';
+                });
+                
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.style.backgroundColor = '';
+                    const element = e.dataTransfer.getData('text/plain');
+                    zone.textContent = element;
+                    
+                    if (index === 0) {
+                        draggedElement1 = element;
+                    } else {
+                        draggedElement2 = element;
+                    }
+                });
+            });
+        }
+
+        // Combine two elements
+        function combineElements() {
+            if (!currentUser) {
+                showMessage(loginMessage, 'Please log in to combine elements', 'error');
+                return;
+            }
+            
+            if (!draggedElement1 || !draggedElement2) {
+                showMessage(resultMessage, 'Please drag two elements to the boxes', 'error');
+                return;
+            }
+            
+            const combination1 = `${draggedElement1}+${draggedElement2}`;
+            const combination2 = `${draggedElement2}+${draggedElement1}`;
+            
+            let result = combinations[combination1] || combinations[combination2];
+            
+            if (result) {
+                // Successful combination
+                const userData = accounts[currentUser];
+                
+                // Add to user's elements if not already there
+                if (!userData.elements.includes(result.name)) {
+                    userData.elements.push(result.name);
+                    userData.elements.sort();
+                    newElement.textContent = `New Element: ${result.name}!`;
+                    newElement.className = `new-element ${result.rarity}`;
+                    showMessage(resultMessage, `You discovered a new ${result.rarity} element!`, 'success');
+                } else {
+                    newElement.textContent = '';
+                    showMessage(resultMessage, `You created ${result.name} (already discovered)`, 'success');
+                }
+                
+                // Update combinations count
+                userData.combinations++;
+                
+                // Save and update UI
+                saveAccounts();
+                renderUserElements();
+                renderAllElements();
+                updateStats();
+            } else {
+                // Failed combination
+                newElement.textContent = '';
+                showMessage(resultMessage, 'These elements cannot be combined', 'error');
+            }
+            
+            // Reset drop zones
+            dropZone1.textContent = '+';
+            dropZone2.textContent = '+';
+            draggedElement1 = null;
+            draggedElement2 = null;
+        }
+
+        // Handle user login
+        function handleLogin() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!username || !password) {
+                showMessage(loginMessage, 'Please enter both username and password', 'error');
+                return;
+            }
+            
+            if (accounts[username] && accounts[username].password === password) {
+                // Successful login
+                currentUser = username;
+                loginAttempts = 0;
+                adminSection.style.display = 'none';
+                loadUserData();
+                showUserInfo();
+                showMessage(loginMessage, 'Login successful!', 'success');
+                usernameInput.value = '';
+                passwordInput.value = '';
+            } else {
+                // Failed login
+                loginAttempts++;
+                
+                if (loginAttempts >= 3) {
+                    // Show admin recovery after 3 failed attempts
+                    adminSection.style.display = 'block';
+                    showMessage(loginMessage, 'Account locked. Too many failed attempts.', 'error');
+                } else {
+                    showMessage(loginMessage, `Invalid credentials. ${3 - loginAttempts} attempts remaining`, 'error');
+                }
+            }
+        }
+
+        // Handle user registration
+        function handleRegister() {
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!username || !password) {
+                showMessage(loginMessage, 'Please enter both username and password', 'error');
+                return;
+            }
+            
+            if (accounts[username]) {
+                showMessage(loginMessage, 'Username already exists', 'error');
+                return;
+            }
+            
+            // Create new account
+            accounts[username] = {
+                password: password,
+                elements: baseElements.map(e => e.name),
+                combinations: 0
+            };
+            
+            saveAccounts();
+            showMessage(loginMessage, 'Account created successfully! You can now log in.', 'success');
+            usernameInput.value = '';
+            passwordInput.value = '';
+        }
+
+        // Handle user logout
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            userInfo.style.display = 'none';
+            renderUserElements();
+            updateStats();
+            showMessage(loginMessage, 'Logged out successfully', 'success');
+        }
+
+        // Handle edit account
+        function handleEditAccount() {
+            const newPassword = prompt('Enter new password (leave blank to keep current):');
+            if (newPassword !== null) {
+                if (newPassword) {
+                    accounts[currentUser].password = newPassword;
+                    saveAccounts();
+                    alert('Password updated successfully!');
+                } else {
+                    alert('Password unchanged.');
+                }
+            }
+        }
+
+        // Handle admin recovery
+        function handleAdminRecovery() {
+            const adminPassword = adminPasswordInput.value;
+            
+            if (adminPassword === ADMIN_PASSWORD) {
+                const username = usernameInput.value.trim();
+                
+                if (accounts[username]) {
+                    // Reset login attempts and hide admin section
+                    loginAttempts = 0;
+                    adminSection.style.display = 'none';
+                    showMessage(loginMessage, 'Account recovery successful. You can now log in.', 'success');
+                    adminPasswordInput.value = '';
+                } else {
+                    showMessage(loginMessage, 'Account not found', 'error');
+                }
+            } else {
+                showMessage(loginMessage, 'Invalid admin password', 'error');
+            }
+        }
+
+        // Load user data
+        function loadUserData() {
+            if (!currentUser || !accounts[currentUser]) {
+                currentUser = null;
+                return;
+            }
+            
+            localStorage.setItem('currentUser', currentUser);
+            renderUserElements();
+        }
+
+        // Show user info section
+        function showUserInfo() {
+            displayUsername.textContent = currentUser;
+            userInfo.style.display = 'block';
+        }
+
+        // Update game statistics
+        function updateStats() {
+            const allElements = getAllElements();
+            totalElements.textContent = allElements.length;
+            
+            if (currentUser) {
+                const userData = accounts[currentUser];
+                userElementsStat.textContent = userData.elements.length;
+                combinationsStat.textContent = userData.combinations;
+            } else {
+                userElementsStat.textContent = '0';
+                combinationsStat.textContent = '0';
+            }
+        }
+
+        // Show message with styling
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = `message ${type}`;
+            
+            // Clear message after 3 seconds
+            setTimeout(() => {
+                element.textContent = '';
+                element.className = 'message';
+            }, 3000);
+        }
+
+        // Save accounts to localStorage
+        function saveAccounts() {
+            localStorage.setItem('infiniteCraftAccounts', JSON.stringify(accounts));
+        }
+
+        // Initialize the game when page loads
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
